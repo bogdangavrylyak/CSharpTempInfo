@@ -67,37 +67,45 @@ namespace WindowsFormsWeatherProject
             string login = textBoxLogin.Text;
 
             string password = textBoxPassword.Text;
-
-            loading();
-
-            using (MyDbContext context = new MyDbContext())
+            if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
             {
-                try
+                MessageBox.Show("No data");
+            }
+            else
+            {
+                loading();
+
+                using (MyDbContext context = new MyDbContext())
                 {
-                    await Task.Run(() =>
+                    try
                     {
-                        if (context.Database.Connection == null)
+                        await Task.Run(() =>
                         {
-                            throw new Exception();
-                        }
+                            if (context.Database.Connection == null)
+                            {
+                                throw new Exception();
+                            }
 
-                        User user = new User()
-                        {
-                            Login = login,
-                            Password = password
-                        };
+                            User user = new User()
+                            {
+                                Login = login,
+                                Password = password
+                            };
 
-                        context.Users.Add(user);
-                        context.SaveChanges();
-                    });
-                    await Task.Delay(3000);
-                    MessageBox.Show("You have been successfully registered");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Exceptipon happened: {ex.Message}");
+                            context.Users.Add(user);
+                            context.SaveChanges();
+                        });
+                        await Task.Delay(3000);
+                        MessageBox.Show("You have been successfully registered");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Exceptipon happened: {ex.Message}");
+                    }
                 }
             }
+
+            
         }
         private async void buttonGoToLogin_Click(object sender, EventArgs e)
         {

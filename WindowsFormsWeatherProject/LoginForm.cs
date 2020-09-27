@@ -65,47 +65,57 @@ namespace WindowsFormsWeatherProject
             string login = textBoxLogin.Text;
 
             string password = textBoxPassword.Text;
-            
-            using (MyDbContext context = new MyDbContext())
+
+            if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
             {
-                try
+                MessageBox.Show("No data");
+            }
+            else
+            {
+                using (MyDbContext context = new MyDbContext())
                 {
-                    if (context.Database.Connection == null)
+                    try
                     {
-                        throw new Exception();
-                    }
-                    User usrToFind = new User();
-                    loading();
-                    await Task.Run(() => { usrToFind = context.Users.Where(usr => usr.Login == login).FirstOrDefault(); });
-
-
-                    if (usrToFind != null)
-                    {
-                        if (usrToFind.Password == password)
+                        if (context.Database.Connection == null)
                         {
-                            // MessageBox.Show("you have successfully entered your account");
-                            //MessageBox.Show($"userlogin: {usrToFind.Login} userpassword: {usrToFind.Password}");
-                            await Task.Delay(2000);
-                            this.Hide();
-                            Form1 form1 = new Form1();
-                            form1.Show();
+                            throw new Exception();
+                        }
+                        User usrToFind = new User();
+                        loading();
+                        await Task.Run(() => { usrToFind = context.Users.Where(usr => usr.Login == login).FirstOrDefault(); });
+
+
+                        if (usrToFind != null)
+                        {
+                            if (usrToFind.Password == password)
+                            {
+                                // MessageBox.Show("you have successfully entered your account");
+                                //MessageBox.Show($"userlogin: {usrToFind.Login} userpassword: {usrToFind.Password}");
+                                await Task.Delay(2000);
+                                this.Hide();
+                                Form1 form1 = new Form1();
+                                form1.Show();
+                            }
+                            else
+                            {
+                                await Task.Delay(3000);
+                                MessageBox.Show("wrong password");
+                            }
                         }
                         else
                         {
                             await Task.Delay(3000);
-                            MessageBox.Show("wrong password");
+                            MessageBox.Show("No user called " + login + " was found");
                         }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        await Task.Delay(3000);
-                        MessageBox.Show("No user called " + login + " was found");
+                        MessageBox.Show($"Exceptipon happened: {ex.Message}");
                     }
-                }catch(Exception ex)
-                {
-                    MessageBox.Show($"Exceptipon happened: {ex.Message}");
                 }
             }
+
+
         }
 
         private async void buttonCreateAcc_Click(object sender, EventArgs e)
